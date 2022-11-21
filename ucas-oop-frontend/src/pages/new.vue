@@ -1,0 +1,4 @@
+<template>
+  <Nav />
+  <Editor />
+</template>
