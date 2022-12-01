@@ -393,7 +393,7 @@ public class ProxyFactory implements MethodInterceptor {
         Enhancer enhancer = new Enhancer();        // 为代理类指定需要代理的类，也即是父类
         enhancer.setSuperclass(target.getClass()); // 设置方法拦截器回调引用，对于代理类上所有方法的调用，都会调用CallBack
         enhancer.setCallback(this);                // 获取动态代理类对象并返回
-        return enhancer.create();                  //创建子类对象，即代理对象
+        return enhancer.create();                  // 创建子类对象，即代理对象
     }
 }
 ```
@@ -452,7 +452,203 @@ public class LogAspects{
 }
 </style>
 
+---
+
+# SpringFramework AOP
+-- Introduction
+
+<b> Why Spring? </b>
+
+>From configuration to security, web apps to big data – whatever the infrastructure needs of your application may be, there is a Spring Project to help you build it. Start small and use just what you need – Spring is modular by design.
+
+>Spring makes programming Java quicker, easier, and safer for everybody. Spring’s focus on speed, simplicity, and productivity has made it the world's most popular Java framework.
+
+<b> Comments </b>
+
+>“We use a lot of the tools that come with the Spring framework and reap the benefits of having a lot of the out of the box solutions, and not having to worry about writing a ton of additional code—so that really saves us some time and energy.”
+
+<b> Spring AOP with AspectJ pointcuts </b>
+
+>Spring provides simple and powerful ways of writing custom aspects by using either a schema-based approach or the @AspectJ annotation style. Both of these styles offer fully typed advice and use of the AspectJ pointcut language while still using Spring AOP for weaving.
+
 --- 
+
+# ProxyFactory From SpringFramework
+--Example of proxy pattern
+
+<div class="grid grid-cols-2 gap-4 mb-5">
+<div>
+<b> 类依赖图 </b>
+<img src="1.png">
+</div>
+
+<div>
+<b> 相关类简介 </b>
+
+1. ProxyConfig：用于保存Proxy的相关基础配置，比如是否使用激进模式optimize、强制开起cglib代理proxyTargetClass、是否暴露代理exposeProxy等
+2. AdvisedSupport：AOP的配置管理类，比起ProxyConfig，其还保存了targetSource、切面的集合advisors、接口集合interfaces等
+3. ProxyCreatorSupport：代理工厂的基础类，提供对可配置AopProxyFactory的便捷访问
+4. ProxyFactory：代理工厂类，用于创建代理对象
+
+</div>
+</div>
+
+<style>
+img {
+    margin: 0 auto;
+}
+</style>
+
+---
+
+# Code of ProxyFactory
+-- How does it works
+
+```java{1-3|4-7|8-10|11-14|15-18|all}
+public class ProxyFactory extends ProxyCreatorSupport {
+	public ProxyFactory() {
+	}
+	public ProxyFactory(Object target) {
+		setTarget(target);
+		setInterfaces(ClassUtils.getAllInterfaces(target));
+	}
+	public ProxyFactory(Class<?>... proxyInterfaces) {
+		setInterfaces(proxyInterfaces);
+	}
+	public ProxyFactory(Class<?> proxyInterface, Interceptor interceptor) {
+		addInterface(proxyInterface);
+		addAdvice(interceptor);
+	}
+	public ProxyFactory(Class<?> proxyInterface, TargetSource targetSource) {
+		addInterface(proxyInterface);
+		setTargetSource(targetSource);
+	}
+```
+<p class="text">
+<b> 构造函数 </b>
+
+1. 直接传递目标对象
+2. 直接传递接口组
+3. 传递接口和拦截器
+4. 传递接口和目标源
+
+</p>
+
+<style>
+.text {
+    position: absolute;
+    top:25%;
+    right:15%;
+}
+</style>
+
+---
+
+# Code of ProxyFactory
+-- How does it works
+
+```java{all|3,7,16|none}
+	@SuppressWarnings("unchecked")
+	public static <T> T getProxy(Class<T> proxyInterface, Interceptor interceptor) {
+		return (T) new ProxyFactory(proxyInterface, interceptor).getProxy();
+	}
+	@SuppressWarnings("unchecked")
+	public static <T> T getProxy(Class<T> proxyInterface, TargetSource targetSource) {
+		return (T) new ProxyFactory(proxyInterface, targetSource).getProxy();
+	}
+	public static Object getProxy(TargetSource targetSource) {
+		if (targetSource.getTargetClass() == null) {
+			throw new IllegalArgumentException("Cannot create class proxy for TargetSource with null target class");
+		}
+		ProxyFactory proxyFactory = new ProxyFactory();
+		proxyFactory.setTargetSource(targetSource);
+		proxyFactory.setProxyTargetClass(true);
+		return proxyFactory.getProxy();
+	}
+``` 
+
+<div v-click class="code">
+
+```java
+	public Object getProxy() {
+		return createAopProxy().getProxy();
+	}
+
+	public Object getProxy(@Nullable ClassLoader classLoader) {
+		return createAopProxy().getProxy(classLoader);
+	}
+
+	public Class<?> getProxyClass(@Nullable ClassLoader classLoader) {
+		return createAopProxy().getProxyClass(classLoader);
+	}
+```
+
+</div>
+
+<style>
+.code {
+    position:absolute;
+    left: 50%;
+    top: 50%;
+    transform:translate(-50%,-50%);
+}
+</style>
+
+---
+
+# Code of ProxyFactory
+-- How does it works
+```java{1,7-12|1,13-15|1-5|all}
+public class ProxyCreatorSupport extends AdvisedSupport {
+
+    public ProxyCreatorSupport() {
+	    this.aopProxyFactory = new DefaultAopProxyFactory();
+    }
+
+	protected final synchronized AopProxy createAopProxy() {
+		if (!this.active) {
+			activate();
+		}
+		return getAopProxyFactory().createAopProxy(this);
+	}
+    
+    public AopProxyFactory getAopProxyFactory() {
+		return this.aopProxyFactory;
+	}
+}
+```
+
+---
+
+# Code of ProxyFactory
+-- How does it works
+```java
+public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
+
+	@Override
+	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
+        // isOptimize(开启优化模式) || proxyTargetClass=true(强制开启cglib代理) || 接口集合为空 ——使用cglib代理
+		if (config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config)) {
+			Class<?> targetClass = config.getTargetClass();
+			if (targetClass == null) {
+				throw new AopConfigException("TargetSource cannot determine target class: " +
+						"Either an interface or a target is required for proxy creation.");
+			}
+            // 例外情况：目标类是接口 || 目标类是代理 || 目标类是lambda工具类 ——使用jdk代理
+			if (targetClass.isInterface() || Proxy.isProxyClass(targetClass) || ClassUtils.isLambdaClass(targetClass)) {
+				return new JdkDynamicAopProxy(config);
+			}
+			return new ObjenesisCglibAopProxy(config);      // 使用cglib代理
+		}
+		else {
+			return new JdkDynamicAopProxy(config);          // 使用jdk代理
+		}
+	}
+}
+```
+
+
+---
 
 # Summary
 -- Advantages, Disadvantages and Differences
