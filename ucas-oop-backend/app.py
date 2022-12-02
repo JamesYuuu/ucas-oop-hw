@@ -1,12 +1,17 @@
 from sanic import Sanic
-from db.db_base import Database
-from route import add_routes
 from sanic_ext import Extend
 
+from routes.route import add_routes
+from middlewares.middleware import add_middleware
+from config.config import add_config
+
 app = Sanic("MarkItDown")
-app.ctx.db = Database()
 Extend(app)
-add_routes()
+
+add_routes(app)
+add_middleware(app)
+
+add_config(app)
 
 if __name__ == "__main__":
     app.run()
