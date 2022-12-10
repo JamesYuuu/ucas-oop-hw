@@ -25,11 +25,11 @@ def extract_user(request: Request):
         request.ctx.user = User(username,password)
 
     else:
-        id = int(request.cookies.get('id'))
+        id = request.cookies.get('id')
         if not id:
             raise Unauthorized
         else:
-            request.ctx.user = get_user(id)
+            request.ctx.user = get_user(int(id))
 
 def add_middleware(app: Sanic):
     app.register_middleware(extract_user, 'request')
