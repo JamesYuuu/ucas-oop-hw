@@ -1,7 +1,6 @@
 <script setup lang= "ts">
 import axios from 'axios'
 import { useRouter } from 'vue-router'
-import { onBeforeMount } from 'vue'
 import CarbonDocument from '~icons/carbon/document'
 import CarbonEdit from '~icons/carbon/edit'
 
@@ -26,7 +25,10 @@ const type_data = reactive<typedata[]>(
   }],
 )
 
-onBeforeMount(() => {
+get_all_types()
+get_data()
+
+function get_all_types() {
   axios.get('/api/index').then(
     (response) => {
       page_data.page_num = response.data.page_num
@@ -34,8 +36,7 @@ onBeforeMount(() => {
     ElMessage.error('请先登录')
     router.push('/login')
   })
-  get_data()
-})
+}
 
 function get_data() {
   axios.get('/api/index', {

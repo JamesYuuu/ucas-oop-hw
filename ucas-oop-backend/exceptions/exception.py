@@ -20,3 +20,8 @@ class Unauthorized(SanicException):
     status_code = 401
     message = "Unauthorized"
     quiet = True
+
+class FileNotFoud(SanicException):
+    status_code = 404
+    message = "File not found"
+    quiet = True

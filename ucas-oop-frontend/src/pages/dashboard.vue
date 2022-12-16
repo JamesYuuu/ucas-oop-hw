@@ -1,4 +1,3 @@
 <template>
   <Nav />
-  <Editor />
 </template>

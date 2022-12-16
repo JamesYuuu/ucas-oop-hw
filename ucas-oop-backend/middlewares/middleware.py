@@ -18,11 +18,17 @@ def get_user(id):
 def get_document(type,article):
     return Document(type,article)
 
+def extract_args(request: Request,str):
+    if request.method == 'GET':
+        return request.args.get(str)
+    else:
+        return request.json.get(str)
+
 def extract_user(request: Request):
 
     if request.uri_template == '/login':
-        username = request.args.get('username')
-        password = request.args.get('password')
+        username = extract_args(request,'username')
+        password = extract_args(request,'password')
         
         if not username or not password:
             raise BadRequestBody
@@ -34,13 +40,19 @@ def extract_user(request: Request):
             raise Unauthorized
         else:
             request.ctx.user = get_user(int(id))
-    
+
+def extract_document(request: Request):
     # TODO: Authority and Create new
     if request.uri_template == '/article':
-        type = request.args.get('type')
-        article = request.args.get('article')
+        type    = extract_args(request,'type')
+        article = extract_args(request,'article')
+
+        if not type or (not article and request.method != 'GET'):
+            raise BadRequestBody
+        
         request.ctx.document = get_document(type,article)
 
 
 def add_middleware(app: Sanic):
     app.register_middleware(extract_user, 'request')
+    app.register_middleware(extract_document, 'request')

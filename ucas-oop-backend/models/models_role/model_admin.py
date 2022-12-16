@@ -30,6 +30,12 @@ class Admin(User):
         self.cursor.execute("SELECT COUNT(DISTINCT type) FROM documents")
         info = self.cursor.fetchone()
         return info[0]//self.type_per_page+1
+
+    def get_all_types(self):
+        self.cursor.execute("SELECT DISTINCT type FROM documents")
+        info = self.cursor.fetchall()
+        types = [item[0] for item in info]
+        return types
         
     
     
