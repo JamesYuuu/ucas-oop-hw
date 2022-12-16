@@ -18,8 +18,8 @@
       <el-menu-item index="/home">
         首页
       </el-menu-item>
-      <el-menu-item index="/new">
-        新增
+      <el-menu-item index="/article">
+        编辑
       </el-menu-item>
       <el-menu-item index="/dashboard">
         管理

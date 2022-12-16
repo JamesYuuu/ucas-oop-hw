@@ -14,4 +14,6 @@ class Document(Database):
         return filename
     
     def get_text(self):
-        pass
+        with open('storage/'+self.type+'/'+self.article+'.md', 'r', encoding='utf-8') as f:
+            text = f.read()
+        return text
