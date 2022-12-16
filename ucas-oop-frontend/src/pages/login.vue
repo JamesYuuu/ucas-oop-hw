@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import axios from "axios"
+import axios from 'axios'
+import type { FormRules } from 'element-plus'
 import CarbonUser from '~icons/carbon/user'
 import CarbonPassword from '~icons/carbon/password'
 import SimpleIconsMarkdown from '~icons/simple-icons/markdown'
 import CarbonLogin from '~icons/carbon/login'
 import CarbonReset from '~icons/carbon/reset'
 import CarbonNewTab from '~icons/carbon/new-tab'
-import { FormRules } from 'element-plus'
 
 const router = useRouter()
 const load = ref(false)
