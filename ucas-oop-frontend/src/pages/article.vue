@@ -158,7 +158,7 @@ function deal_error(err: AxiosResponse) {
       </el-menu>
     </el-col>
     <el-col :span="24 - span">
-      <MdEditor v-model="text" preview-theme="vuepress" class="editor" :tab-width="4" @save="save()" />
+      <MdEditor v-model="text" preview-theme="vuepress" class="editor" :tab-width="4" no-upload-img @save="save()" />
     </el-col>
   </el-row>
 

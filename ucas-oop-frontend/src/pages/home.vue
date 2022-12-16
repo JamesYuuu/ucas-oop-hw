@@ -131,6 +131,6 @@ function get_more(type_name: string, article_name: string) {
 
 .box-card {
   width: 480px;
-  height: 300px ;
+  height: 310px ;
 }
 </style>
