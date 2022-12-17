@@ -4,6 +4,7 @@ class Admin(User):
 
     document_per_type = 6
     type_per_page = 6
+    default_password = 123456
 
     def __init__(self,id):
         self.cursor.execute("SELECT username,password FROM users WHERE id = ?", (id,))
@@ -47,8 +48,18 @@ class Admin(User):
     # use for reset password default password = 123456
     @classmethod
     def reset_password(cls,username):
-        default_password = 123456
-        cls.cursor.execute("UPDATE users SET password = ? WHERE username = ?", (default_password, username))
+
+        cls.cursor.execute("UPDATE users SET password = ? WHERE username = ?", (cls.default_password, username))
+        cls.conn.commit()
+
+    @classmethod
+    def create_user(cls,username):
+        cls.cursor.execute("INSERT INTO users (username,password) VALUES (?,?)",(username,cls.default_password,))
+        cls.conn.commit()
+
+    @classmethod
+    def change_username(cls,username,new_name):
+        cls.cursor.execute("UPDATE users SET username = ? WHERE username = ?", (new_name, username))
         cls.conn.commit()
         
     

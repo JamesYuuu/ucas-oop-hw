@@ -64,8 +64,9 @@ def extract_dashboard(request: Request):
     
     if request.uri_template == '/dashboard/article':
         article = extract_args(request,'name')
+        type = extract_args(request,'type')
         if article:
-            request.ctx.document = Document(article)
+            request.ctx.document = Document(article,type)
         elif (request.method != 'GET'):
             raise BadRequestBody
 

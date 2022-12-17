@@ -21,7 +21,7 @@ const form = reactive({
   article: '',
 })
 
-const text = ref('')
+const text = ref('# Hello World')
 
 const article_all = reactive<string[]>([])
 const types_all = reactive<string[]>([])
@@ -170,7 +170,7 @@ function deal_error(err: AxiosResponse) {
         </el-select>
       </el-form-item>
       <el-form-item label="标题" :label-width="formLabelWidth">
-        <el-input v-model="form.article" autocomplete="on" autosize />
+        <el-input v-model="form.article" autocomplete="on" autosize clearable />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -196,7 +196,7 @@ function deal_error(err: AxiosResponse) {
   }
 
 .header {
-  margin-left: 35%;
+  margin-left: 5%;
 }
 
 .el-button--text {

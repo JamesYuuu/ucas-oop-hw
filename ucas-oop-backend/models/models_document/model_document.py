@@ -1,5 +1,4 @@
 from databases.database_base import Database
-import datetime
 
 from functools import wraps
 
@@ -22,10 +21,6 @@ class Document(Type):
         if not type:
             type = self.get_type()
         super().__init__(type)
-
-    @staticmethod
-    def get_time():
-        return datetime.datetime.now().strftime('%Y-%m-%d')
 
     def get_type(self):
         self.cursor.execute("SELECT type FROM documents WHERE filename = ?",(self.article,))
@@ -71,5 +66,10 @@ class Document(Type):
 
     @renew_edit_time
     def update_document(self, new_name):
-        self.cursor.execute("UPDATE documents SET filename = ? WHERE filename = ?",(self.article,new_name,))
+        self.cursor.execute("UPDATE documents SET filename = ? WHERE filename = ? and type = ?",(new_name,self.article,self.type))
         self.conn.commit()
+
+    def exist(self):
+        self.cursor.execute("SELECT filename FROM documents WHERE filename = ?",(self.article,))
+        info = self.cursor.fetchone()
+        return info != None
