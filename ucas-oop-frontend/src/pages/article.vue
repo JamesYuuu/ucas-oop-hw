@@ -55,9 +55,9 @@ function get_all_article() {
 }
 
 function get_all_types() {
-  axios.get('/api/index').then(
+  axios.get('/api/dashboard/type').then(
     (response) => {
-      types_all.values = response.data.types
+      types_all.values = response.data.result
     }).catch(() => {
     ElMessage.error('请先登录')
     router.push('/login')

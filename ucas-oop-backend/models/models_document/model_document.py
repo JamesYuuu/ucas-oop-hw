@@ -6,15 +6,14 @@ from functools import wraps
 def renew_edit_time(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        args[0].update_edit_time(args[0])
+        args[0].update_edit_time()
         return f(*args, **kwargs)
     return decorated_function
 
 
 class Document(Database):
 
-    def __init__(self, type=None, article=None):
-        super().__init__()
+    def __init__(self, type, article):
         self.type = type
         self.article = article
 
@@ -22,7 +21,6 @@ class Document(Database):
     def get_time():
         return datetime.datetime.now().strftime('%Y-%m-%d')
     
-    @staticmethod
     def update_edit_time(self):
         current_time = self.get_time()
         self.cursor.execute(
@@ -41,7 +39,7 @@ class Document(Database):
             with open('storage/'+self.type+'/'+self.article+'.md', 'r', encoding='utf-8') as f:
                 text = f.read()
         except FileNotFoundError:
-            return None
+            text = '# Hello World'
         return text
 
     def create_document(self):
@@ -54,3 +52,19 @@ class Document(Database):
     def update_text(self, text):
         with open('storage/'+self.type+'/'+self.article+'.md', 'w+', encoding='utf-8') as f:
             f.write(text)
+
+    @classmethod
+    def get_all_documents(cls):
+        cls.cursor.execute("SELECT filename FROM documents")
+        info = cls.cursor.fetchall()
+        filename = [item[0] for item in info]
+        return filename
+    
+    def delete_document(self):
+        self.cursor.execute("DELETE FROM documents WHERE filename = ?",(self.article,))
+        self.conn.commit()
+
+    @renew_edit_time
+    def update_document(self, new_name):
+        self.cursor.execute("UPDATE documents SET filename = ? WHERE filename = ?",(self.article,new_name,))
+        self.conn.commit()

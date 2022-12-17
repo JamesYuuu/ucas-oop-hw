@@ -6,6 +6,7 @@ from models.models_role.model_admin import Admin
 from models.models_role.model_visitor import Visitor
 
 from models.models_document.model_document import Document
+from models.models_document.model_type import Type
 
 from exceptions.exception import *
 
@@ -15,14 +16,14 @@ def get_user(id):
     else:
         return Visitor(id)
 
-def get_document(type,article):
-    return Document(type,article)
-
 def extract_args(request: Request,str):
     if request.method == 'GET':
         return request.args.get(str)
     else:
-        return request.json.get(str)
+        try:
+            return request.json.get(str)
+        except AttributeError:
+            return None
 
 def extract_user(request: Request):
 
@@ -50,9 +51,19 @@ def extract_document(request: Request):
         if not type or (not article and request.method != 'GET'):
             raise BadRequestBody
         
-        request.ctx.document = get_document(type,article)
+        request.ctx.document = Document(type,article)
+
+def extract_type(request: Request):
+
+    if request.uri_template == '/dashboard/type':
+        type = extract_args(request,'type') 
+        if type:
+            request.ctx.type = Type(type)
+        elif (request.method != 'GET'):
+            raise BadRequestBody
 
 
 def add_middleware(app: Sanic):
-    app.register_middleware(extract_user, 'request')
-    app.register_middleware(extract_document, 'request')
+    app.middleware('request')(extract_user)
+    app.middleware('request')(extract_document)
+    app.middleware('request')(extract_type)

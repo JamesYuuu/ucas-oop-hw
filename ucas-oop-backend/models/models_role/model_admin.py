@@ -1,5 +1,4 @@
 from .model_user import User
-from sanic.log import logger
 
 class Admin(User):
 
@@ -7,9 +6,9 @@ class Admin(User):
     type_per_page = 6
 
     def __init__(self,id):
-        super().__init__()
-        self.cursor.execute("SELECT * FROM users WHERE id = ?", (id,))
-        self.id,self.username,self.password = self.cursor.fetchone()
+        self.cursor.execute("SELECT username,password FROM users WHERE id = ?", (id,))
+        username,password = self.cursor.fetchone()
+        super().__init__(username,password)
     
     # return 6 documents for one page
     def get_documents(self,type):
@@ -26,16 +25,11 @@ class Admin(User):
         types = [item[0] for item in info]
         return types
 
-    def get_page_num(self):
-        self.cursor.execute("SELECT COUNT(DISTINCT type) FROM documents")
-        info = self.cursor.fetchone()
-        return info[0]//self.type_per_page+1
-
-    def get_all_types(self):
-        self.cursor.execute("SELECT DISTINCT type FROM documents")
+    def get_all_users(self):
+        self.cursor.execute("SELECT username FROM users")
         info = self.cursor.fetchall()
-        types = [item[0] for item in info]
-        return types
+        users = [item[0] for item in info]
+        return users
         
     
     

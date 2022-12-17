@@ -29,9 +29,9 @@ get_all_types()
 get_data()
 
 function get_all_types() {
-  axios.get('/api/index').then(
+  axios.get('/api/dashboard/type').then(
     (response) => {
-      page_data.page_num = response.data.page_num
+      page_data.page_num = Math.ceil(response.data.length / 6)
     }).catch(() => {
     ElMessage.error('请先登录')
     router.push('/login')

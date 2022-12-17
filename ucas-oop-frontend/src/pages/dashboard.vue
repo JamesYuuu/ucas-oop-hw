@@ -14,9 +14,9 @@ const types_all = reactive<string[]>([])
 get_all_types()
 
 function get_all_types() {
-  axios.get('/api/index').then(
+  axios.get('/api/dashboard/type').then(
     (response) => {
-      types_all.values = response.data.types
+      types_all.values = response.data.result
     }).catch(() => {
     ElMessage.error('请先登录')
     router.push('/login')
@@ -60,6 +60,9 @@ function get_all_types() {
           </el-menu-item>
         </el-sub-menu>
       </el-menu>
+    </el-col>
+    <el-col :span="21">
+      <span />
     </el-col>
   </el-row>
 </template>

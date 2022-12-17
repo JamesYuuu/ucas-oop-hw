@@ -3,7 +3,6 @@ from databases.database_base import Database
 class User(Database):
 
     def __init__(self,username = None,password = None):
-        super().__init__()
         self.username = username
         self.password = password
     
@@ -14,12 +13,15 @@ class User(Database):
 
     # use for login
     def login_user(self):
-        self.cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (self.username, self.password))
-        self.id,*_= self.cursor.fetchone()
-        if self.id:
-            return True
-        else:
-            return False
+        self.cursor.execute("SELECT id FROM users WHERE username = ? AND password = ?", (self.username, self.password))
+        result = self.cursor.fetchone()
+        self.id = result[0] if result else None
+        return self.id != None
+    
+    # use for delete
+    def delete_user(self):
+        self.cursor.execute("DELETE FROM users WHERE username = ?", (self.username,))
+        self.conn.commit()
     
     # use for update password
     def change_password(self):
@@ -36,8 +38,8 @@ class User(Database):
     def check_username(self):
         self.cursor.execute("SELECT * FROM users WHERE username = ?", (self.username,))
         user = self.cursor.fetchone()
-        if user:
-            return True
-        else:
-            return False
+        return user != None
+
+    def exist(self):
+        return self.login_user()
 

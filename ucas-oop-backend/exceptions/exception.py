@@ -1,14 +1,14 @@
 
 from sanic.exceptions import SanicException
 
-class UserNotFound(SanicException):
+class NotFound(SanicException):
     status_code = 404
-    message = "User not found"
+    message = "Not found"
     quiet = True
 
-class UserAlreadyExists(SanicException):
+class AlreadyExists(SanicException):
     status_code = 409
-    message = "User already exists"
+    message = "Already exists"
     quiet = True
 
 class BadRequestBody(SanicException):
@@ -19,9 +19,4 @@ class BadRequestBody(SanicException):
 class Unauthorized(SanicException):
     status_code = 401
     message = "Unauthorized"
-    quiet = True
-
-class FileNotFoud(SanicException):
-    status_code = 404
-    message = "File not found"
     quiet = True
