@@ -11,5 +11,5 @@ def add_routes(app: Sanic, bp:Blueprint):
     app.add_route(article.as_view(), "/article")
 
     bp.add_route(dashboard_type.as_view(),'/type')
-    bp.add_route(dashboard_document.as_view(),'/document')
+    bp.add_route(dashboard_document.as_view(),'/article')
     bp.add_route(dashboard_user.as_view(),'/user')

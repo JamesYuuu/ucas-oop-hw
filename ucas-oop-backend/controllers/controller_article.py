@@ -9,17 +9,14 @@ from sanic_ext import openapi
 class article(HTTPMethodView):
     
     @openapi.description('''
-        if document.type is empty we return a new md ("# Hello World")
         if document.article is empty we return all articles of the type
         if document.article is not empty we return the text of the article    
     ''')
     @openapi.summary("This is used to get some informations")
     def get(self, request: Request):
         document = request.ctx.document
-        if not document.type:
-            return json('# Hello World')
         if not document.article:
-            result=document.get_all()
+            result=document.get_all_articles()
             return json({'length':len(result),'result':result})
         else:
             text = document.get_text()

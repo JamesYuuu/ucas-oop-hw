@@ -17,7 +17,7 @@ def get_user(id):
         return Visitor(id)
 
 def extract_args(request: Request,str):
-    if request.method == 'GET':
+    if request.method in ['GET','DELETE']:
         return request.args.get(str)
     else:
         try:
@@ -44,21 +44,28 @@ def extract_user(request: Request):
 
 def extract_document(request: Request):
     # TODO: Authority and Create new
-    if request.uri_template == '/article':
-        type    = extract_args(request,'type')
+    if request.uri_template =='/article':
+        type = extract_args(request,'type')
         article = extract_args(request,'article')
 
-        if not type or (not article and request.method != 'GET'):
+        if (not article and request.method != 'GET'):
             raise BadRequestBody
         
-        request.ctx.document = Document(type,article)
+        request.ctx.document = Document(article,type)
 
-def extract_type(request: Request):
+def extract_dashboard(request: Request):
 
     if request.uri_template == '/dashboard/type':
-        type = extract_args(request,'type') 
+        type = extract_args(request,'name') 
         if type:
             request.ctx.type = Type(type)
+        elif (request.method != 'GET'):
+            raise BadRequestBody
+    
+    if request.uri_template == '/dashboard/article':
+        article = extract_args(request,'name')
+        if article:
+            request.ctx.document = Document(article)
         elif (request.method != 'GET'):
             raise BadRequestBody
 
@@ -66,4 +73,4 @@ def extract_type(request: Request):
 def add_middleware(app: Sanic):
     app.middleware('request')(extract_user)
     app.middleware('request')(extract_document)
-    app.middleware('request')(extract_type)
+    app.middleware('request')(extract_dashboard)

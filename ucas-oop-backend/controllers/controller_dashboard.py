@@ -8,12 +8,12 @@ from sanic_ext import openapi
 
 from models.models_document.model_type import Type
 from models.models_document.model_document import Document
+from models.models_role.model_admin import Admin
 
 from decorators.decorator import check_exist,authorized
 
 from .controller_login import login
 
-from functools import wraps
 
 class dashboard_type(HTTPMethodView):
         
@@ -47,28 +47,32 @@ class dashboard_user(login):
     @openapi.summary("This is used to get all users")
     @authorized
     def get(self, request: Request):
-        result = request.ctx.user.get_all_users()
+        result = Admin.get_all_users()
         return json({'length':len(result),'result':result})
     
     @openapi.summary("This is used for reset password")
     @check_exist('user')
     @authorized
     def put(self, request:Request):
-        request.ctx.user.reset_password()
+        password = request.json.get('password')
+        Admin.reset_password(password)
         return json({"message": "Reset password successful"})
     
     @openapi.summary("This is used for change password")
     @check_exist('user')
     @authorized
     def patch(self, request:Request):
-        request.ctx.user.change_password()
+        password = request.json.get('password')
+        user = request.json.get('user')
+        Admin.change_password(user,password)
         return json({"message": "Change password successful"})
     
     @openapi.summary("This is used for delete user")
     @check_exist('user')
     @authorized
     def delete(self, request:Request):
-        request.ctx.user.delete_user()
+        user = request.args.get('user')
+        Admin.delete_user(user)
         return json({"message": "Delete user successful"})
 
 class dashboard_document(HTTPMethodView):

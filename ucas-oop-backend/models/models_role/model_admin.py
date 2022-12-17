@@ -25,11 +25,31 @@ class Admin(User):
         types = [item[0] for item in info]
         return types
 
-    def get_all_users(self):
-        self.cursor.execute("SELECT username FROM users")
-        info = self.cursor.fetchall()
+    @classmethod
+    def get_all_users(cls):
+        cls.cursor.execute("SELECT username FROM users")
+        info = cls.cursor.fetchall()
         users = [item[0] for item in info]
         return users
+
+    # use for delete
+    @classmethod
+    def delete_user(cls,username):
+        cls.cursor.execute("DELETE FROM users WHERE username = ?", (username,))
+        cls.conn.commit()
+    
+    # use for update password
+    @classmethod
+    def change_password(cls,password,username):
+        cls.cursor.execute("UPDATE users SET password = ? WHERE username = ?", (password, username))
+        cls.conn.commit()
+    
+    # use for reset password default password = 123456
+    @classmethod
+    def reset_password(cls,username):
+        default_password = 123456
+        cls.cursor.execute("UPDATE users SET password = ? WHERE username = ?", (default_password, username))
+        cls.conn.commit()
         
     
     
