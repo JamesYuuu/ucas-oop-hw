@@ -62,6 +62,3 @@ class Admin(User):
         cls.cursor.execute("UPDATE users SET username = ? WHERE username = ?", (new_name, username))
         cls.conn.commit()
         
-    
-    
-
