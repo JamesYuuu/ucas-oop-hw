@@ -1,6 +1,6 @@
 # UCAS-OOP-22AU
 
-## Introduction 
+## Introduction
 
 Repository for UCAS Object Oriented Progamming Course (2022 Autumn)
 
