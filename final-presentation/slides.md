@@ -246,16 +246,16 @@ User --|> Admin
 User --|> Visitor
 User --|> Contributor
 
-HTTPMethodView<|--ViewLogin
-HTTPMethodView<|--ViewHomepage
-HTTPMethodView<|--ViewEdit
-HTTPMethodView<|--ViewDashboard
+HTTPMethodView<|--ControllerLogin
+HTTPMethodView<|--ControllerHomepage
+HTTPMethodView<|--ControllerEdit
+HTTPMethodView<|--ControllerDashboard
 
-ViewLogin ..> User
-ViewHomepage ..> Document
-ViewEdit ..> Document
-ViewDashboard ..> Document
-ViewDashboard ..> User
+ControllerLogin ..> User
+ControllerHomepage ..> Document
+ControllerEdit ..> Document
+ControllerDashboard ..> Document
+ControllerDashboard ..> User
 
 Admin --|> User
 Visitor --|> User
